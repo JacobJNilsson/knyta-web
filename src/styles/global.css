@@ -462,6 +462,10 @@ h2 {
   text-decoration-color: var(--accent);
 }
 
+.who ul .y + .n {
+  margin-top: 1.1rem;
+}
+
 .who p {
   color: var(--muted);
 }

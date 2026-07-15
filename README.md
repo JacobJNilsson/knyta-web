@@ -1,6 +1,6 @@
 # knyta-web
 
-The marketing site for [Knyta](https://knyta.net) — an AI-assisted data-ingestion engine. Postgres and Supabase are supported destinations today; APIs, other databases, and more are in the works.
+The marketing site for [Knyta](https://knyta.net) — an AI-assisted data-ingestion engine. Postgres is the supported destination today; APIs, other databases, and more are in the works.
 
 Fully static: no client-side JavaScript, no cookies, no trackers. Dark mode follows `prefers-color-scheme`.
 

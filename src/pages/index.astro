@@ -9,7 +9,7 @@ const trefoil =
 
 const title = "Knyta — messy customer data in, clean data out";
 const description =
-  "Knyta is an AI-assisted data-ingestion engine. It turns the files your customers actually send into clean rows where they belong — with pipelines you can read, replay, and trust. Postgres today; more destinations on the way.";
+  "Knyta is an AI-assisted data-ingestion engine. It turns the CSVs, exports, and odd files other people send you into clean rows where they belong — with pipelines you can read, replay, and trust. Postgres today; more destinations on the way.";
 ---
 
 <html lang="en">
@@ -59,8 +59,8 @@ const description =
           </h1>
           <p class="lede">
             Knyta is an <strong>AI-assisted data-ingestion engine</strong>. It
-            turns the CSVs, exports, and odd files your customers actually send
-            into clean rows in your schema — with pipelines you can
+            turns the CSVs, exports, and odd files other people send you into
+            clean rows where they belong — with pipelines you can
             <strong>read, replay, and trust</strong>.
           </p>
           <div class="cta-row">
@@ -82,13 +82,13 @@ const description =
 
       <section id="problem">
         <p class="sec-label">01 — the problem</p>
-        <h2>Every file your customers send is somebody's Tuesday evening.</h2>
+        <h2>Every file someone sends you is somebody's Tuesday evening.</h2>
         <p class="sec-intro">
-          You built a product that runs on customer data. Your customers send
-          that data as <strong>whatever their other system exports</strong> —
-          headers on line four, decimal commas, three date formats in one
-          column, a TOTAL row at the bottom. Generic ETL tools assume clean
-          input. Reality doesn't cooperate, so you clean it by hand.
+          Your work runs on data other people produce, and it arrives as
+          <strong>whatever their system happened to export</strong> — headers
+          on line four, decimal commas, three date formats in one column, a
+          TOTAL row at the bottom. Generic ETL tools assume clean input.
+          Reality doesn't cooperate, so someone cleans it by hand. Usually you.
         </p>
 
         <div class="transform">
@@ -153,8 +153,8 @@ ORDER NO,customer,Amount ,date
           <li>
             <h3>A file lands on its channel</h3>
             <p>
-              Every customer gets their own intake channel. Files arrive
-              however they arrive — you stop being the person who forwards
+              Every sender gets their own intake channel. Files arrive however
+              they arrive — you stop being the person who forwards
               attachments.
             </p>
           </li>
@@ -244,8 +244,8 @@ ORDER NO,customer,Amount ,date
             <p>
               A value that doesn't validate is flagged, not guessed. A delivery
               whose outcome is unknown is quarantined, not reported clean.
-              You'll never discover an import problem from a customer email
-              three weeks later.
+              You'll never discover an import problem three weeks later,
+              downstream, in something that mattered.
             </p>
           </div>
         </div>
@@ -255,28 +255,35 @@ ORDER NO,customer,Amount ,date
         <p class="sec-label">04 — who it's for</p>
         <div class="who">
           <div>
-            <h2>Built for builders.</h2>
+            <h2>If someone else's file decides how your week goes.</h2>
             <p>
-              Knyta is for small teams whose product <strong>runs on customer
-              data</strong> — analytics dashboards, fin-ops platforms,
-              marketplaces, vertical SaaS. The teams where "the importer broke"
-              means a founder loses an evening, because there is no data
-              engineer to page.
+              We keep meeting this problem in places we didn't expect. A
+              founder whose product runs on customer uploads. A recruiter
+              reconciling candidate lists that arrive in a different shape from
+              every client. An analyst whose month starts with the same
+              spreadsheet and the same twenty minutes of cleaning.
+            </p>
+            <p style="margin-top: 1rem;">
+              Different jobs, <strong>identical problem</strong>: the data is
+              someone else's to format and yours to deal with. If that's a
+              recurring line item in your week, Knyta is probably for you —
+              whatever your title says.
             </p>
             <p style="margin-top: 1rem;">
               Destinations are <strong>pluggable by design</strong>: each one
               declares its capabilities, and the engine delivers to it with the
-              same transactional care. Postgres and Supabase are supported
-              today; APIs, other databases, and more are in the works.
+              same transactional care. Postgres is supported today; APIs, other
+              databases, and more are in the works.
             </p>
           </div>
           <ul>
-            <li class="y">solo founders &amp; indie hackers</li>
-            <li class="y">1–10 person product teams</li>
-            <li class="y">Postgres today · more destinations next</li>
+            <li class="y">the file arrives as an attachment</li>
+            <li class="y">the format changes without warning</li>
+            <li class="y">only you know what the columns mean</li>
+            <li class="y">"the export" is the integration</li>
             <li class="n">book-a-demo walls</li>
             <li class="n">per-seat enterprise pricing</li>
-            <li class="n">quarterly onboarding projects</li>
+            <li class="n">"just send it in our template"</li>
           </ul>
         </div>
       </section>
@@ -286,9 +293,9 @@ ORDER NO,customer,Amount ,date
         <h2>Tell us about your worst file.</h2>
         <p>
           Knyta is currently working hands-on with a small number of early
-          teams. If ingesting customer data is stealing your week, send us the
+          users. If someone else's data is stealing your week, send us the
           ugliest file you deal with — we'll tell you honestly whether we can
-          tie it down.
+          tie it down. We're genuinely curious where this problem turns up.
         </p>
         <a
           class="email"
