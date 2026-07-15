@@ -1,0 +1,33 @@
+# knyta-web
+
+The marketing site for [Knyta](https://knyta.net) — an AI-assisted data-ingestion engine for builders on Postgres and Supabase.
+
+Fully static: no client-side JavaScript, no cookies, no trackers. Dark mode follows `prefers-color-scheme`.
+
+## Stack
+
+- [Astro](https://astro.build) — static output only
+- Self-hosted fonts via Fontsource (Bricolage Grotesque + IBM Plex Mono)
+- Hand-rolled CSS in `src/styles/global.css` (design tokens at the top)
+
+The knot mark is a parametric trefoil (`x = sin t + 2 sin 2t, y = cos t − 2 cos 2t`) rendered as a single SVG stroke — the path string lives in `src/pages/index.astro` and `public/favicon.svg`.
+
+## Development
+
+```bash
+npm install
+npm run dev       # http://localhost:4321
+npm run build     # static output in dist/
+npm run preview
+```
+
+## Deployment (Vercel)
+
+The repo is imported as a Vercel project; Vercel auto-detects Astro (build `astro build`, output `dist/`). Every push to `main` deploys production; PRs get preview deployments.
+
+Domain: `knyta.net` (+ `www` redirect) is attached to the Vercel project. DNS lives wherever the domain is registered — point `A @ → 76.76.21.21` and `CNAME www → cname.vercel-dns.com` if not using Vercel nameservers.
+
+## TODO
+
+- [ ] Set up email for `hello@knyta.net` (registrar forwarding or Cloudflare Email Routing) — the site's only CTA points there.
+- [ ] OG image (currently text-only OG tags).
