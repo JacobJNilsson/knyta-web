@@ -7,9 +7,9 @@ import "../styles/global.css";
 const trefoil =
   "M 100.0,76.9 L 108.2,77.2 L 116.4,78.1 L 124.4,79.6 L 132.1,81.7 L 139.6,84.3 L 146.7,87.4 L 153.4,91.0 L 159.6,95.0 L 165.2,99.4 L 170.2,104.2 L 174.6,109.2 L 178.3,114.4 L 181.3,119.8 L 183.6,125.2 L 185.2,130.6 L 186.0,136.0 L 186.0,141.3 L 185.3,146.3 L 183.9,151.1 L 181.7,155.6 L 178.9,159.7 L 175.5,163.3 L 171.5,166.4 L 166.9,169.0 L 161.9,171.0 L 156.4,172.4 L 150.5,173.2 L 144.4,173.2 L 138.0,172.6 L 131.5,171.3 L 124.8,169.3 L 118.2,166.6 L 111.6,163.3 L 105.2,159.3 L 98.9,154.7 L 92.9,149.6 L 87.3,143.9 L 82.0,137.7 L 77.1,131.1 L 72.8,124.1 L 68.9,116.8 L 65.6,109.3 L 62.9,101.7 L 60.8,93.9 L 59.3,86.1 L 58.5,78.4 L 58.3,70.9 L 58.6,63.5 L 59.7,56.4 L 61.2,49.7 L 63.4,43.4 L 66.0,37.5 L 69.2,32.3 L 72.7,27.6 L 76.7,23.5 L 80.9,20.1 L 85.5,17.5 L 90.2,15.5 L 95.1,14.4 L 100.0,14.0 L 104.9,14.4 L 109.8,15.5 L 114.5,17.5 L 119.1,20.1 L 123.3,23.5 L 127.3,27.6 L 130.8,32.3 L 134.0,37.5 L 136.6,43.4 L 138.8,49.7 L 140.3,56.4 L 141.4,63.5 L 141.7,70.9 L 141.5,78.4 L 140.7,86.1 L 139.2,93.9 L 137.1,101.7 L 134.4,109.3 L 131.1,116.8 L 127.2,124.1 L 122.9,131.1 L 118.0,137.7 L 112.7,143.9 L 107.1,149.6 L 101.1,154.7 L 94.8,159.3 L 88.4,163.3 L 81.8,166.6 L 75.2,169.3 L 68.5,171.3 L 62.0,172.6 L 55.6,173.2 L 49.5,173.2 L 43.6,172.4 L 38.1,171.0 L 33.1,169.0 L 28.5,166.4 L 24.5,163.3 L 21.1,159.7 L 18.3,155.6 L 16.1,151.1 L 14.7,146.3 L 14.0,141.3 L 14.0,136.0 L 14.8,130.6 L 16.4,125.2 L 18.7,119.8 L 21.7,114.4 L 25.4,109.2 L 29.8,104.2 L 34.8,99.4 L 40.4,95.0 L 46.6,91.0 L 53.3,87.4 L 60.4,84.3 L 67.9,81.7 L 75.6,79.6 L 83.6,78.1 L 91.8,77.2 L 100.0,76.9 Z";
 
-const title = "Knyta — messy customer data in, clean Postgres out";
+const title = "Knyta — messy customer data in, clean data out";
 const description =
-  "Knyta is an AI-assisted ingestion engine for builders on Postgres and Supabase. It turns the files your customers actually send into clean rows in your schema — with pipelines you can read, replay, and trust.";
+  "Knyta is an AI-assisted data-ingestion engine. It turns the files your customers actually send into clean rows where they belong — with pipelines you can read, replay, and trust. Postgres today; more destinations on the way.";
 ---
 
 <html lang="en">
@@ -58,10 +58,10 @@ const description =
             >.
           </h1>
           <p class="lede">
-            Knyta is an AI-assisted ingestion engine for builders on
-            <strong>Postgres and Supabase</strong>. It turns the CSVs, exports,
-            and odd files your customers actually send into clean rows in your
-            schema — with pipelines you can <strong>read, replay, and trust</strong>.
+            Knyta is an <strong>AI-assisted data-ingestion engine</strong>. It
+            turns the CSVs, exports, and odd files your customers actually send
+            into clean rows in your schema — with pipelines you can
+            <strong>read, replay, and trust</strong>.
           </p>
           <div class="cta-row">
             <a class="btn btn-primary" href="mailto:hello@knyta.net"
@@ -255,19 +255,25 @@ ORDER NO,customer,Amount ,date
         <p class="sec-label">04 — who it's for</p>
         <div class="who">
           <div>
-            <h2>Built for builders on Postgres.</h2>
+            <h2>Built for builders.</h2>
             <p>
               Knyta is for small teams whose product <strong>runs on customer
               data</strong> — analytics dashboards, fin-ops platforms,
-              marketplaces, vertical SaaS — built on Supabase or Postgres. The
-              teams where "the importer broke" means a founder loses an
-              evening, because there is no data engineer to page.
+              marketplaces, vertical SaaS. The teams where "the importer broke"
+              means a founder loses an evening, because there is no data
+              engineer to page.
+            </p>
+            <p style="margin-top: 1rem;">
+              Destinations are <strong>pluggable by design</strong>: each one
+              declares its capabilities, and the engine delivers to it with the
+              same transactional care. Postgres and Supabase are supported
+              today; APIs, other databases, and more are in the works.
             </p>
           </div>
           <ul>
             <li class="y">solo founders &amp; indie hackers</li>
             <li class="y">1–10 person product teams</li>
-            <li class="y">Supabase / Postgres stacks</li>
+            <li class="y">Postgres today · more destinations next</li>
             <li class="n">book-a-demo walls</li>
             <li class="n">per-seat enterprise pricing</li>
             <li class="n">quarterly onboarding projects</li>
