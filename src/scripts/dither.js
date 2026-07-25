@@ -292,6 +292,7 @@ export function startDither(canvas, opts = {}) {
   let fieldTmp = null; // scratch for the separable blur
   let holdSel = null;  // last committed palette index per cell (255 = unset)
   let holdTime = null; // ms timestamp of each cell's last colour switch
+  let creamData = null; // full-canvas fill of the low palette colour (out-of-band rows)
   // The boid field is rendered into a buffer padded by PAD cells on every side so
   // boids just off-screen still contribute to on-screen density and the blur has
   // real neighbour data past the visible edge (no edge thinning / flicker).
@@ -502,6 +503,13 @@ export function startDither(canvas, opts = {}) {
     }
     holdSel = new Uint8Array(bw * bh).fill(255);
     holdTime = new Float64Array(bw * bh);
+    // Precompute a solid fill of the low palette colour; the viewport-band
+    // renderer copies it in so off-band rows always show the page cream.
+    creamData = new Uint8ClampedArray(bw * bh * 4);
+    for (let i = 0; i < creamData.length; i += 4) {
+      creamData[i] = PAL[0][0]; creamData[i + 1] = PAL[0][1]; creamData[i + 2] = PAL[0][2]; creamData[i + 3] = 255;
+    }
+    img.data.set(creamData);
     if (isBoids) {
       const target = targetCount();
       if (boids.length !== target) initBoids(target);
@@ -511,10 +519,14 @@ export function startDither(canvas, opts = {}) {
   // Separable box blur over the accumulation buffer, so the discrete boid
   // splats merge into one smooth blob *before* it gets dithered. This keeps the
   // chunky dither texture (unlike a CSS blur, which would smooth it away).
-  function blurBuffer(r) {
+  // Blur only the row range [ry0, ry1) of the padded buffer (defaults to all).
+  // The horizontal pass covers ry0-r..ry1+r so the vertical pass has valid data.
+  function blurBuffer(r, ry0, ry1) {
     const norm = 1 / (2 * r + 1);
-    // Horizontal pass: fieldArr -> fieldTmp (over the padded fw x fh buffer)
-    for (let y = 0; y < fh; y++) {
+    const a0 = ry0 == null ? 0 : ry0, a1 = ry1 == null ? fh : ry1;
+    const hy0 = Math.max(0, a0 - r), hy1 = Math.min(fh, a1 + r);
+    // Horizontal pass: fieldArr -> fieldTmp
+    for (let y = hy0; y < hy1; y++) {
       const o = y * fw;
       for (let x = 0; x < fw; x++) {
         let s = 0;
@@ -527,7 +539,7 @@ export function startDither(canvas, opts = {}) {
     }
     // Vertical pass: fieldTmp -> fieldArr
     for (let x = 0; x < fw; x++) {
-      for (let y = 0; y < fh; y++) {
+      for (let y = a0; y < a1; y++) {
         let s = 0;
         for (let k = -r; k <= r; k++) {
           let yy = y + k; if (yy < 0) yy = 0; else if (yy >= fh) yy = fh - 1;
@@ -567,16 +579,26 @@ export function startDither(canvas, opts = {}) {
     if (Math.abs(soff - prevSoff) > 1e-5) lastScrollMs = now;
     prevSoff = soff;
     const scrolling = now - lastScrollMs < 180;
+    // Only render the band of buffer rows near the viewport. The swarm's home
+    // tracks the view, so the field is cream everywhere else; off-band rows are
+    // filled from creamData. Huge saving on a tall (document-anchored) page.
+    let vy0 = 0, vy1 = bh;
+    if (isBoids && scroll) {
+      const m = Math.round(vhCells * 0.6); // margin absorbs blur + swarm lag on scroll
+      vy0 = Math.max(0, Math.floor(scrollY / scale) - m);
+      vy1 = Math.min(bh, Math.ceil((scrollY + (window.innerHeight || 1)) / scale) + m);
+      img.data.set(creamData);
+    }
     if (isBoids) {
       // The boid canvas is document-anchored (position: absolute over the whole
       // page), so scrolling is handled natively by the browser — no offset here.
       stepBoids(t);
       splatBoids();
       const br = Math.max(1, Math.round(vhCells * cfg.blur));
-      for (let p = 0; p < cfg.blurPasses; p++) blurBuffer(br);
+      for (let p = 0; p < cfg.blurPasses; p++) blurBuffer(br, vy0 + PAD, vy1 + PAD);
     }
     const data = img.data;
-    for (let y = 0; y < bh; y++) {
+    for (let y = vy0; y < vy1; y++) {
       const ny = y / bh;
       const mrow = M[y % mN];
       for (let x = 0; x < bw; x++) {
