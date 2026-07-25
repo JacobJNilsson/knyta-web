@@ -40,6 +40,15 @@ const description =
       a { color: inherit; }
       ::selection { background: var(--red); color: var(--cream); }
 
+      /* Legibility halo. A soft cream glow keeps text readable where the swarm's
+         warm core drifts behind it — invisible over the cream page, it only
+         reads over the dither. Preferred over a flat scrim so the swarm stays
+         vivid. Elements with their own solid fill (cards, buttons) are excluded. */
+      h1, h2, h3, .eyebrow, .lede, .cta-ghost, .sec-no, .sec-intro, .who p, .who ul,
+      .steps > li > p, .demo-note, .contact p, .contact .email, header, footer {
+        text-shadow: 0 0 6px var(--cream), 0 0 3px var(--cream);
+      }
+
       /* Page-wide dithered swarm. Absolute (not fixed) so it's pinned to the
          document and scrolls with the page; its height is set to the full page
          height in JS. The field's low end is the page cream, so it reads as a
