@@ -255,6 +255,12 @@ export function startDither(canvas, opts = {}) {
   let curT = 0;
   let prevSoff = 0;         // previous scroll offset, to detect active scrolling
   let lastScrollMs = -1e9;  // timestamp of the last scroll movement
+  // Fixed-timestep integration: the boid physics is tuned per 1/60 s step, so we
+  // advance it at a steady 60 steps/second regardless of the display's refresh
+  // rate. Without this the swarm's speed scales with frame rate (2x on 120 Hz).
+  const STEP_MS = 1000 / 60;
+  let lastNow = null;       // timestamp of the previous frame
+  let acc = 0;              // unspent real time, in ms, awaiting fixed steps
   const cleanups = [];
   const clearRGB = clear ? hexToRgb(clear.color || '#f3ede1') : null;
   const clearR = clear ? (clear.radius ?? 0.16) : 0;
@@ -554,18 +560,29 @@ export function startDither(canvas, opts = {}) {
     if (start === null) start = now;
     const t = ((now - start) / 1000) * speed;
     curT = t;
+    // Real time since the last frame, scaled by `speed`. Clamp to ~5 steps so a
+    // stalled/backgrounded tab doesn't unleash a burst of catch-up steps.
+    let dt = (lastNow === null ? STEP_MS : now - lastNow) * speed;
+    lastNow = now;
+    if (dt > STEP_MS * 5) dt = STEP_MS * 5;
+    if (dt < 0) dt = 0;
+    // Frame-rate-independent exponential smoothing: a per-1/60s-step factor,
+    // compounded over however many steps this frame spans, so easings converge
+    // at the same wall-clock rate on 60 Hz and 120 Hz alike.
+    const dtSteps = dt / STEP_MS;
+    const ease = (base) => 1 - Math.pow(1 - base, dtSteps);
     // Ease pointer toward its target and smooth the press amount.
-    P.px += (P.tx - P.px) * 0.12;
-    P.py += (P.ty - P.py) * 0.12;
-    P.pd += (P.down - P.pd) * 0.15;
+    P.px += (P.tx - P.px) * ease(0.12);
+    P.py += (P.ty - P.py) * ease(0.12);
+    P.pd += (P.down - P.pd) * ease(0.15);
     // Blob centre: a slow drift toward the pointer (or screen centre when idle)
     // plus organic wander, so it moves *toward* the cursor and feels alive.
     const gx = P.active ? P.tx : 0.5;
     const gy = P.active ? P.ty : 0.5;
     const wanderX = Math.sin(t * 0.5) * 0.05 + Math.sin(t * 1.13 + 1.7) * 0.03;
     const wanderY = Math.cos(t * 0.43) * 0.05 + Math.sin(t * 0.97 + 0.6) * 0.03;
-    P.bx += (gx + wanderX - P.bx) * 0.045;
-    P.by += (gy + wanderY - P.by) * 0.045;
+    P.bx += (gx + wanderX - P.bx) * ease(0.045);
+    P.by += (gy + wanderY - P.by) * ease(0.045);
     // Drop expired ripples (rings live ~1.8s).
     if (P.ripples.length) P.ripples = P.ripples.filter((r) => t - r.t < 1.8);
     const fctx = P;
@@ -592,7 +609,12 @@ export function startDither(canvas, opts = {}) {
     if (isBoids) {
       // The boid canvas is document-anchored (position: absolute over the whole
       // page), so scrolling is handled natively by the browser — no offset here.
-      stepBoids(t);
+      // Advance the physics in fixed 1/60s steps, running as many as the real
+      // elapsed time calls for (0..5). This decouples swarm speed from refresh
+      // rate: 120 Hz renders twice as often but steps the boids just as fast.
+      acc += dt;
+      let steps = 0;
+      while (acc >= STEP_MS && steps < 5) { stepBoids(t); acc -= STEP_MS; steps++; }
       splatBoids();
       const br = Math.max(1, Math.round(vhCells * cfg.blur));
       for (let p = 0; p < cfg.blurPasses; p++) blurBuffer(br, vy0 + PAD, vy1 + PAD);
