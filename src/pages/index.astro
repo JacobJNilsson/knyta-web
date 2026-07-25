@@ -11,7 +11,31 @@ import "@fontsource/newsreader/600-italic.css";
 
 const title = "Knyta — messy customer data in, clean data out";
 const description =
-  "Knyta is an AI-assisted data-ingestion engine. It turns the CSVs, exports, and odd files other people send you into clean rows where they belong — pipelines you can read, replay, and trust. Postgres today; more destinations on the way.";
+  "Knyta is an AI-assisted data-ingestion engine. It turns the CSVs, exports, and one-off files other people send you into clean rows in your database — through pipelines you can read, replay, and trust. Postgres today; more destinations on the way.";
+const site = "https://knyta.net";
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": `${site}/#org`,
+      name: "Knyta",
+      url: `${site}/`,
+      email: "hello@knyta.net",
+      logo: `${site}/favicon.svg`,
+    },
+    {
+      "@type": "WebSite",
+      "@id": `${site}/#website`,
+      url: `${site}/`,
+      name: "Knyta",
+      description,
+      inLanguage: "en",
+      publisher: { "@id": `${site}/#org` },
+    },
+  ],
+};
 ---
 <html lang="en">
   <head>
@@ -21,10 +45,17 @@ const description =
     <meta name="description" content={description} />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="canonical" href="https://knyta.net/" />
+    <meta name="theme-color" content="#f2ede3" />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     <meta property="og:url" content="https://knyta.net/" />
     <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Knyta" />
+    <meta property="og:locale" content="en_US" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} is:inline />
     <style>
       :root {
         --cream: #f2ede3;
