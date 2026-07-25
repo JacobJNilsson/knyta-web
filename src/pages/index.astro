@@ -1,6 +1,13 @@
 ---
 import "@fontsource/ibm-plex-mono/400.css";
 import "@fontsource/ibm-plex-mono/500.css";
+// Editorial display face (variable: optical size + weight) for headlines and the
+// wordmark; warm, screen-tuned text face for body prose. Self-hosted so the
+// brand looks identical everywhere, not just on Apple devices with Hoefler Text.
+import "@fontsource-variable/fraunces/standard.css";
+import "@fontsource-variable/fraunces/standard-italic.css";
+import "@fontsource/newsreader/400.css";
+import "@fontsource/newsreader/600-italic.css";
 
 const title = "Knyta — messy customer data in, clean data out";
 const description =
@@ -31,7 +38,8 @@ const description =
         --good: #3d6b3f;
         --line: rgba(34,16,22,0.20);
         --line-soft: rgba(34,16,22,0.10);
-        --serif: "Hoefler Text", "Baskerville", "Iowan Old Style", Palatino, Georgia, serif;
+        --display: "Fraunces Variable", "Hoefler Text", "Iowan Old Style", Palatino, Georgia, serif;
+        --serif: "Newsreader", "Hoefler Text", "Iowan Old Style", Palatino, Georgia, serif;
         --mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
       }
       * { box-sizing: border-box; margin: 0; }
@@ -72,7 +80,7 @@ const description =
         text-transform: uppercase; color: var(--wine);
         padding: 1.6rem 0; border-bottom: 1px solid var(--line);
       }
-      header .brand { font-family: var(--serif); font-style: italic; font-size: 1.5rem; letter-spacing: -0.01em; text-transform: none; color: var(--red); line-height: 1; text-decoration: none; }
+      header .brand { font-family: var(--display); font-style: italic; font-size: 1.5rem; letter-spacing: -0.01em; text-transform: none; color: var(--red); line-height: 1; text-decoration: none; }
       header .rooms { display: flex; gap: 1.6rem; }
       header .rooms a { text-decoration: none; }
       header .rooms a:hover { color: var(--red); }
@@ -80,7 +88,7 @@ const description =
       section { padding: clamp(3rem, 7vw, 6rem) 0; border-top: 1px solid var(--line); }
       section:first-of-type { border-top: none; }
       .sec-no { font-family: var(--mono); font-size: 0.68rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--red); margin-bottom: 1rem; }
-      h2 { font-family: var(--serif); font-weight: 500; font-size: clamp(1.9rem, 4.2vw, 3rem); line-height: 1.05; letter-spacing: -0.015em; max-width: 26ch; }
+      h2 { font-family: var(--display); font-weight: 500; font-size: clamp(1.9rem, 4.2vw, 3rem); line-height: 1.05; letter-spacing: -0.015em; max-width: 26ch; }
       h2 em { font-style: italic; color: var(--red); }
       .sec-intro { font-family: var(--mono); font-size: 0.84rem; line-height: 1.8; color: var(--muted); max-width: 44rem; margin-top: 1.4rem; }
       .sec-intro strong { color: var(--ink); font-weight: 500; }
@@ -91,7 +99,7 @@ const description =
       .eyebrow b { color: var(--red); font-weight: 500; }
       .eyebrow i { font-style: italic; text-transform: none; letter-spacing: 0; }
       h1 {
-        font-family: var(--serif); font-weight: 600;
+        font-family: var(--display); font-weight: 600;
         font-size: clamp(2.8rem, 8.5vw, 6.5rem); line-height: 0.94; letter-spacing: -0.02em;
         max-width: 15ch; color: var(--plum);
       }
@@ -142,7 +150,7 @@ const description =
       .steps li:last-child { padding-bottom: 0; }
       .steps li::before { content: ""; position: absolute; left: 0; top: 0.3rem; width: 1rem; height: 1rem; border-radius: 50%; background: var(--cream); border: 2px solid var(--red); }
       .steps li.last::before { background: var(--red); }
-      .steps h3 { font-family: var(--serif); font-weight: 500; font-size: 1.25rem; letter-spacing: -0.01em; margin-bottom: 0.4rem; color: var(--plum); }
+      .steps h3 { font-family: var(--display); font-weight: 500; font-size: 1.25rem; letter-spacing: -0.01em; margin-bottom: 0.4rem; color: var(--plum); }
       .steps h3 .tag { font-family: var(--mono); font-size: 0.6rem; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: var(--red); border: 1px solid var(--red); border-radius: 99px; padding: 0.12rem 0.5rem; margin-left: 0.5rem; vertical-align: 0.18em; white-space: nowrap; }
       .steps p { font-family: var(--mono); font-size: 0.78rem; line-height: 1.85; color: var(--muted); }
       .steps p b { color: var(--ink); font-weight: 500; }
@@ -151,7 +159,7 @@ const description =
       .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.1rem; margin-top: 2.4rem; }
       .principle { background: var(--raised); border: 1px solid var(--line); border-radius: 4px; padding: 1.6rem 1.6rem 1.5rem; }
       .principle .num { font-family: var(--mono); font-size: 0.7rem; letter-spacing: 0.1em; color: var(--red); display: block; margin-bottom: 0.9rem; }
-      .principle h3 { font-family: var(--serif); font-weight: 500; font-size: 1.2rem; letter-spacing: -0.01em; margin-bottom: 0.5rem; color: var(--plum); }
+      .principle h3 { font-family: var(--display); font-weight: 500; font-size: 1.2rem; letter-spacing: -0.01em; margin-bottom: 0.5rem; color: var(--plum); }
       .principle p { font-family: var(--mono); font-size: 0.76rem; line-height: 1.85; color: var(--muted); }
 
       /* Contact */
