@@ -22,11 +22,26 @@ import "@fontsource/ibm-plex-mono/500.css";
         --mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
       }
       * { box-sizing: border-box; margin: 0; }
-      html, body { background: var(--cream); }
-      body { color: var(--ink); font-family: var(--serif); font-size: 1.0625rem; line-height: 1.55; -webkit-font-smoothing: antialiased; }
+      html { background: var(--cream); }
+      body { background: transparent; color: var(--ink); font-family: var(--serif); font-size: 1.0625rem; line-height: 1.55; -webkit-font-smoothing: antialiased; }
       a { color: inherit; }
 
-      .frame { min-height: 100vh; padding: clamp(0.9rem, 2.4vw, 1.9rem); }
+      /* Page-wide dithered swarm. Absolute (not fixed) so it's pinned to the
+         document and scrolls with the page; its height is set to the full page
+         height in JS. The field's low end is the page cream, so it reads as a
+         soft warm presence, not a slab. */
+      #bg {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        z-index: 0;
+        display: block;
+        image-rendering: pixelated; /* crisp dither dots — the blur is in the field, not here */
+        pointer-events: none;
+      }
+
+      .frame { position: relative; z-index: 1; min-height: 100vh; padding: clamp(0.9rem, 2.4vw, 1.9rem); }
       .mat {
         border: 1.5px solid var(--red);
         min-height: calc(100vh - clamp(1.8rem, 4.8vw, 3.8rem));
@@ -64,6 +79,7 @@ import "@fontsource/ibm-plex-mono/500.css";
       .tickets:hover { background: var(--plum); }
       .ghost { font-family: var(--mono); font-size: 0.78rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); text-decoration: none; }
       .ghost:hover { color: var(--red); }
+      .hint { font-family: var(--mono); font-size: 0.68rem; letter-spacing: 0.04em; color: var(--muted); margin-top: 1.4rem; opacity: 0.8; }
 
       section.block { padding: clamp(2.5rem, 6vw, 5rem) 0; border-top: 1px solid var(--line); }
       .sec-no { font-family: var(--mono); font-size: 0.68rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--red); margin-bottom: 1rem; }
@@ -92,6 +108,7 @@ import "@fontsource/ibm-plex-mono/500.css";
     </style>
   </head>
   <body>
+    <canvas id="bg"></canvas>
     <div class="frame">
       <div class="mat">
         <header>
@@ -112,6 +129,7 @@ import "@fontsource/ibm-plex-mono/500.css";
             <a class="tickets" href="mailto:hello@knyta.net">hello@knyta.net</a>
             <a class="ghost" href="#work">see how it's made ↓</a>
           </div>
+          <p class="hint">move your cursor — the swarm scatters away from it</p>
         </section>
 
         <section class="block" id="work">
@@ -146,5 +164,42 @@ import "@fontsource/ibm-plex-mono/500.css";
         </footer>
       </div>
     </div>
+
+    <script>
+      import { startDither } from "../../scripts/dither.js";
+      const c = document.getElementById("bg");
+      // Size the document-anchored canvas to the full page height. Collapse it
+      // first: an absolutely-positioned element still counts toward scrollHeight,
+      // so measuring while it's tall would let the page grow past its content.
+      const sizeBg = () => {
+        if (!c) return;
+        c.style.height = "0px";
+        c.style.height = document.documentElement.scrollHeight + "px";
+      };
+      sizeBg();
+      const ctrl = c && startDither(c, {
+        respectReducedMotion: false,
+        interactive: true,
+        scroll: true,
+        scrollFactor: 0.3,
+        palette: ["#f2ede3", "#f0d9ae", "#ecc07f", "#e8481f"],
+        field: "boids",
+        matrix: 8,
+        speed: 1,
+        boidCount: 128,
+        scale: 4,
+        cfg: {
+          maxSpeed: 0.0079, maxForce: 0.00036, perception: 0.27, separationDist: 0.075,
+          cohesion: 1, alignment: 1.05, separation: 2.25, flee: 9.4, fleeRadius: 0.52,
+          centering: 0.0004, homeSpeed: 0.155, edgeRepel: 0.0028, edgeMargin: 0.065,
+          damping: 0.96, splatSize: 0.025, splatIntensity: 2.4, blur: 0.1, blurPasses: 2, holdMs: 1,
+        },
+      });
+
+      // Keep the canvas matched to the page height, and re-measure once fonts /
+      // images settle (forcing the engine to recompute its buffers).
+      window.addEventListener("resize", sizeBg);
+      window.addEventListener("load", () => { sizeBg(); if (ctrl) ctrl.setScale(ctrl.getScale()); });
+    </script>
   </body>
 </html>
