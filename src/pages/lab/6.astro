@@ -106,9 +106,56 @@ import "@fontsource/ibm-plex-mono/500.css";
         header .rooms { display: none; }
       }
     </style>
+
+    <!-- Panel styles are GLOBAL: the panel's rows/labels/inputs are created in
+         JS, so Astro's scoped selectors would never match them. -->
+    <style is:global>
+      /* Live tuning panel — matted-print card matching the Riso frame.
+         Hidden until the visitor types the cheat-word "swarm". */
+      #panel { display: none; }
+      #panel.revealed { display: block; }
+      #panel {
+        position: fixed; top: 14px; right: 14px; z-index: 20;
+        width: 252px; max-height: calc(100vh - 28px); overflow-y: auto;
+        background: rgba(242,237,227,0.94); color: #221016;
+        border: 1.5px solid #e8481f; border-radius: 2px;
+        font-family: "IBM Plex Mono", ui-monospace, Menlo, monospace; font-size: 11px; line-height: 1.45;
+        padding: 12px 14px; backdrop-filter: blur(3px);
+        box-shadow: 0 8px 30px rgba(34,16,22,0.16);
+      }
+      #panel h3 { font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase; color: #e8481f; margin-bottom: 11px; padding-bottom: 9px; border-bottom: 1px solid rgba(34,16,22,0.20); display: flex; justify-content: space-between; }
+      #panel .row { margin-bottom: 13px; }
+      #panel .row label { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 0 8px; margin-bottom: 6px; font-size: 10px; letter-spacing: 0.02em; color: #7a5a54; text-transform: uppercase; }
+      #panel .row label b { color: #221016; font-weight: 500; text-transform: none; }
+      /* Stylised range: thin plum-tinted rail with a red tick thumb */
+      #panel input[type=range] { -webkit-appearance: none; appearance: none; display: block; width: 100%; height: 3px; margin: 0; background: rgba(34,16,22,0.20); border-radius: 2px; cursor: pointer; }
+      #panel input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 8px; height: 15px; margin-top: -6px; background: #e8481f; border: none; border-radius: 1px; cursor: pointer; }
+      #panel input[type=range]::-moz-range-thumb { width: 8px; height: 15px; background: #e8481f; border: none; border-radius: 1px; cursor: pointer; }
+      #panel input[type=range]::-moz-range-track { height: 3px; background: rgba(34,16,22,0.20); border-radius: 2px; }
+      #panel input[type=range]:hover::-webkit-slider-thumb { background: #221016; }
+      #panel input[type=range]:hover::-moz-range-thumb { background: #221016; }
+      #panel .btns { display: flex; gap: 8px; margin-top: 12px; }
+      #panel button { flex: 1; font-family: inherit; font-size: 9px; text-transform: uppercase; letter-spacing: 0.12em; padding: 7px; border-radius: 2px; border: 1px solid rgba(34,16,22,0.20); background: transparent; color: #7a1f3d; cursor: pointer; transition: background 0.15s, color 0.15s, border-color 0.15s; }
+      #panel button:hover { border-color: #e8481f; background: #e8481f; color: #f2ede3; }
+      #panel.collapsed .body { display: none; }
+      #panel .toggle { cursor: pointer; color: #7a5a54; }
+      #panel .toggle:hover { color: #e8481f; }
+      #panel textarea { width: 100%; height: 60px; margin-top: 8px; font-family: inherit; font-size: 9px; background: rgba(34,16,22,0.05); color: #7a1f3d; border: 1px solid rgba(34,16,22,0.20); border-radius: 2px; display: none; }
+    </style>
   </head>
   <body>
     <canvas id="bg"></canvas>
+    <div id="panel">
+      <h3><span>swarm tuning</span><span class="toggle" id="pt">[hide]</span></h3>
+      <div class="body">
+        <div id="sliders"></div>
+        <div class="btns">
+          <button id="copyCfg">copy config</button>
+          <button id="resetCfg">reset</button>
+        </div>
+        <textarea id="cfgOut" readonly></textarea>
+      </div>
+    </div>
     <div class="frame">
       <div class="mat">
         <header>
@@ -200,6 +247,93 @@ import "@fontsource/ibm-plex-mono/500.css";
       // images settle (forcing the engine to recompute its buffers).
       window.addEventListener("resize", sizeBg);
       window.addEventListener("load", () => { sizeBg(); if (ctrl) ctrl.setScale(ctrl.getScale()); });
+
+      if (ctrl) {
+        // [label, key, min, max, step]. Special keys: count, scale.
+        const SPEC = [
+          ["density (agents / ref screen)", "count", 5, 300, 1],
+          ["dither dot size (scale)", "scale", 2, 12, 1],
+          ["max speed", "maxSpeed", 0.0005, 0.012, 0.0002],
+          ["max force", "maxForce", 0.00004, 0.001, 0.00002],
+          ["perception radius", "perception", 0.05, 0.7, 0.01],
+          ["separation dist", "separationDist", 0.01, 0.16, 0.005],
+          ["cohesion", "cohesion", 0, 4, 0.05],
+          ["alignment", "alignment", 0, 3, 0.05],
+          ["separation", "separation", 0, 4, 0.05],
+          ["flee strength", "flee", 0, 10, 0.1],
+          ["flee radius", "fleeRadius", 0.05, 0.6, 0.01],
+          ["damping (settle)", "damping", 0.6, 1, 0.01],
+          ["centering (home pull)", "centering", 0, 0.004, 0.0001],
+          ["home wander speed", "homeSpeed", 0, 0.3, 0.005],
+          ["edge repel strength", "edgeRepel", 0, 0.005, 0.0001],
+          ["edge repel margin", "edgeMargin", 0.01, 0.25, 0.005],
+          ["blob size (splat)", "splatSize", 0.01, 0.16, 0.005],
+          ["blob intensity", "splatIntensity", 0.2, 6, 0.1],
+          ["blur amount", "blur", 0, 0.16, 0.005],
+          ["blur passes (roundness)", "blurPasses", 0, 6, 1],
+          ["colour hold (ms, anti-flicker)", "holdMs", 1, 10, 0.5],
+        ];
+        const STORE = "knyta-swarm-cfg";
+        const defaults = { count: ctrl.getCount(), scale: ctrl.getScale(), ...JSON.parse(JSON.stringify(ctrl.cfg)) };
+        const get = (k) => k === "count" ? ctrl.getCount() : k === "scale" ? ctrl.getScale() : ctrl.cfg[k];
+        const set = (k, v) => {
+          if (k === "count") ctrl.setCount(v);
+          else if (k === "scale") ctrl.setScale(v);
+          else ctrl.cfg[k] = v;
+        };
+        const save = () => {
+          const o = {}; for (const [, key] of SPEC) o[key] = get(key);
+          try { localStorage.setItem(STORE, JSON.stringify(o)); } catch (e) {}
+        };
+        // Restore a previously-tuned config so reloads (incl. code edits) don't wipe it.
+        try {
+          const saved = JSON.parse(localStorage.getItem(STORE) || "null");
+          if (saved) for (const [, key] of SPEC) if (key in saved && typeof saved[key] === "number") set(key, saved[key]);
+        } catch (e) {}
+        const fmt = (v) => Math.abs(v) < 0.01 && v !== 0 ? v.toExponential(1) : (Math.round(v * 1000) / 1000);
+        const box = document.getElementById("sliders");
+        const readouts = {};
+        for (const [label, key, min, max, step] of SPEC) {
+          const row = document.createElement("div"); row.className = "row";
+          const lab = document.createElement("label");
+          const nm = document.createElement("span"); nm.textContent = label;
+          const val = document.createElement("b"); val.textContent = fmt(get(key)); readouts[key] = val;
+          lab.appendChild(nm); lab.appendChild(val);
+          const inp = document.createElement("input");
+          inp.type = "range"; inp.min = min; inp.max = max; inp.step = step; inp.value = get(key);
+          inp.addEventListener("input", () => { const v = parseFloat(inp.value); set(key, v); val.textContent = fmt(v); save(); });
+          row.appendChild(lab); row.appendChild(inp); box.appendChild(row);
+        }
+        const out = document.getElementById("cfgOut");
+        document.getElementById("copyCfg").addEventListener("click", () => {
+          const dump = { boidCount: ctrl.getCount(), scale: ctrl.getScale(), cfg: ctrl.cfg };
+          const txt = JSON.stringify(dump, null, 2);
+          out.style.display = "block"; out.value = txt;
+          navigator.clipboard && navigator.clipboard.writeText(txt).catch(() => {});
+        });
+        document.getElementById("resetCfg").addEventListener("click", () => {
+          try { localStorage.removeItem(STORE); } catch (e) {}
+          for (const [, key] of SPEC) {
+            set(key, defaults[key]);
+            const inp = readouts[key].closest(".row").querySelector("input");
+            inp.value = defaults[key]; readouts[key].textContent = fmt(defaults[key]);
+          }
+        });
+        const panel = document.getElementById("panel");
+        document.getElementById("pt").addEventListener("click", () => {
+          panel.classList.toggle("collapsed");
+          document.getElementById("pt").textContent = panel.classList.contains("collapsed") ? "[show]" : "[hide]";
+        });
+
+        // Hidden cheat-word: type "swarm" to toggle the panel (again to hide it).
+        let typed = "";
+        window.addEventListener("keydown", (e) => {
+          if (e.key && e.key.length === 1) {
+            typed = (typed + e.key.toLowerCase()).slice(-5);
+            if (typed === "swarm") { panel.classList.toggle("revealed"); typed = ""; }
+          }
+        });
+      }
     </script>
   </body>
 </html>
