@@ -82,13 +82,16 @@ const jsonLd = {
       a { color: inherit; }
       ::selection { background: var(--red); color: var(--cream); }
 
-      /* Legibility halo. A soft cream glow keeps text readable where the swarm's
-         warm core drifts behind it — invisible over the cream page, it only
-         reads over the dither. Preferred over a flat scrim so the swarm stays
-         vivid. Elements with their own solid fill (cards, buttons) are excluded. */
+      /* Legibility outline. A crisp 1px cream border around the glyphs keeps text
+         readable where the swarm's warm core drifts behind it — a hard edge (no
+         blur, no fade), built from eight 0-blur shadows for a gap-free ring.
+         Invisible over the cream page. Elements with their own solid fill (cards,
+         buttons) are excluded. */
       h1, h2, h3, .eyebrow, .lede, .cta-ghost, .sec-no, .sec-intro, .who p, .who ul,
       .steps > li > p, .demo-note, .contact p, .contact .email, header, footer {
-        text-shadow: 0 0 6px var(--cream), 0 0 3px var(--cream);
+        text-shadow:
+          1px 0 0 var(--cream), -1px 0 0 var(--cream), 0 1px 0 var(--cream), 0 -1px 0 var(--cream),
+          1px 1px 0 var(--cream), -1px 1px 0 var(--cream), 1px -1px 0 var(--cream), -1px -1px 0 var(--cream);
       }
 
       /* Page-wide dithered swarm. Absolute (not fixed) so it's pinned to the
