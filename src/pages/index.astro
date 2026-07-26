@@ -457,6 +457,7 @@ ORDER NO,customer,Amount ,date
         const SPEC = [
           ["density (agents / ref screen)", "count", 5, 300, 1],
           ["dither dot size (scale)", "scale", 2, 12, 1],
+          ["simulation steps / sec", "stepRate", 1, 60, 1],
           ["max speed", "maxSpeed", 0.0005, 0.012, 0.0002],
           ["max force", "maxForce", 0.00004, 0.001, 0.00002],
           ["perception radius", "perception", 0.05, 0.7, 0.01],
@@ -478,11 +479,12 @@ ORDER NO,customer,Amount ,date
           ["colour hold (ms, anti-flicker)", "holdMs", 1, 10, 0.5],
         ];
         const STORE = "knyta-swarm-cfg";
-        const defaults = { count: ctrl.getCount(), scale: ctrl.getScale(), ...JSON.parse(JSON.stringify(ctrl.cfg)) };
-        const get = (k) => k === "count" ? ctrl.getCount() : k === "scale" ? ctrl.getScale() : ctrl.cfg[k];
+        const defaults = { count: ctrl.getCount(), scale: ctrl.getScale(), stepRate: ctrl.getStepRate(), ...JSON.parse(JSON.stringify(ctrl.cfg)) };
+        const get = (k) => k === "count" ? ctrl.getCount() : k === "scale" ? ctrl.getScale() : k === "stepRate" ? ctrl.getStepRate() : ctrl.cfg[k];
         const set = (k, v) => {
           if (k === "count") ctrl.setCount(v);
           else if (k === "scale") ctrl.setScale(v);
+          else if (k === "stepRate") ctrl.setStepRate(v);
           else ctrl.cfg[k] = v;
         };
         const save = () => {
@@ -510,7 +512,7 @@ ORDER NO,customer,Amount ,date
         }
         const out = document.getElementById("cfgOut");
         document.getElementById("copyCfg").addEventListener("click", () => {
-          const dump = { boidCount: ctrl.getCount(), scale: ctrl.getScale(), cfg: ctrl.cfg };
+          const dump = { boidCount: ctrl.getCount(), scale: ctrl.getScale(), stepsPerSec: Math.round(ctrl.getStepRate()), cfg: ctrl.cfg };
           const txt = JSON.stringify(dump, null, 2);
           out.style.display = "block"; out.value = txt;
           navigator.clipboard && navigator.clipboard.writeText(txt).catch(() => {});

@@ -255,11 +255,11 @@ export function startDither(canvas, opts = {}) {
   let curT = 0;
   let prevSoff = 0;         // previous scroll offset, to detect active scrolling
   let lastScrollMs = -1e9;  // timestamp of the last scroll movement
-  // Fixed-timestep integration: advance the boid physics a steady 20 steps per
-  // second regardless of the display's refresh rate. This both decouples speed
-  // from frame rate (no 2x on 120 Hz) and keeps the swarm deliberately calm —
-  // a slower, lighter pace than the per-frame stepping it replaced.
-  const STEP_MS = 1000 / 20;
+  // Fixed-timestep integration: advance the boid physics a steady N steps per
+  // second regardless of the display's refresh rate. This decouples speed from
+  // frame rate (no 2x on 120 Hz). Fewer steps/sec = slower + lighter but choppier
+  // motion; more = smoother. Runtime-adjustable via the controller.
+  let stepMs = 1000 / Math.max(1, Math.min(60, opts.stepsPerSec ?? 20));
   let lastNow = null;       // timestamp of the previous frame
   let acc = 0;              // unspent real time, in ms, awaiting fixed steps
   const cleanups = [];
@@ -563,14 +563,14 @@ export function startDither(canvas, opts = {}) {
     curT = t;
     // Real time since the last frame, scaled by `speed`. Clamp to ~5 steps so a
     // stalled/backgrounded tab doesn't unleash a burst of catch-up steps.
-    let dt = (lastNow === null ? STEP_MS : now - lastNow) * speed;
+    let dt = (lastNow === null ? stepMs : now - lastNow) * speed;
     lastNow = now;
-    if (dt > STEP_MS * 5) dt = STEP_MS * 5;
+    if (dt > stepMs * 5) dt = stepMs * 5;
     if (dt < 0) dt = 0;
     // Frame-rate-independent exponential smoothing: a per-1/60s-step factor,
     // compounded over however many steps this frame spans, so easings converge
     // at the same wall-clock rate on 60 Hz and 120 Hz alike.
-    const dtSteps = dt / STEP_MS;
+    const dtSteps = dt / stepMs;
     const ease = (base) => 1 - Math.pow(1 - base, dtSteps);
     // Ease pointer toward its target and smooth the press amount.
     P.px += (P.tx - P.px) * ease(0.12);
@@ -615,7 +615,7 @@ export function startDither(canvas, opts = {}) {
       // rate: 120 Hz renders twice as often but steps the boids just as fast.
       acc += dt;
       let steps = 0;
-      while (acc >= STEP_MS && steps < 5) { stepBoids(t); acc -= STEP_MS; steps++; }
+      while (acc >= stepMs && steps < 5) { stepBoids(t); acc -= stepMs; steps++; }
       splatBoids();
       const br = Math.max(1, Math.round(vhCells * cfg.blur));
       for (let p = 0; p < cfg.blurPasses; p++) blurBuffer(br, vy0 + PAD, vy1 + PAD);
@@ -701,6 +701,9 @@ export function startDither(canvas, opts = {}) {
     getCount: () => boidCount,
     setScale: (s) => { cancelAnimationFrame(raf); scale = Math.max(1, s); resize(); frame(performance.now()); },
     getScale: () => scale,
+    // Simulation cadence, in physics steps per second (1..60).
+    setStepRate: (n) => { stepMs = 1000 / Math.max(1, Math.min(60, n)); },
+    getStepRate: () => 1000 / stepMs,
     dispose: () => { cancelAnimationFrame(raf); cleanups.forEach((f) => f()); },
   };
   canvas.__dither = controller;
