@@ -255,10 +255,11 @@ export function startDither(canvas, opts = {}) {
   let curT = 0;
   let prevSoff = 0;         // previous scroll offset, to detect active scrolling
   let lastScrollMs = -1e9;  // timestamp of the last scroll movement
-  // Fixed-timestep integration: the boid physics is tuned per 1/60 s step, so we
-  // advance it at a steady 60 steps/second regardless of the display's refresh
-  // rate. Without this the swarm's speed scales with frame rate (2x on 120 Hz).
-  const STEP_MS = 1000 / 60;
+  // Fixed-timestep integration: advance the boid physics a steady 20 steps per
+  // second regardless of the display's refresh rate. This both decouples speed
+  // from frame rate (no 2x on 120 Hz) and keeps the swarm deliberately calm —
+  // a slower, lighter pace than the per-frame stepping it replaced.
+  const STEP_MS = 1000 / 20;
   let lastNow = null;       // timestamp of the previous frame
   let acc = 0;              // unspent real time, in ms, awaiting fixed steps
   const cleanups = [];
