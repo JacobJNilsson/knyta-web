@@ -1,13 +1,11 @@
 ---
 import "@fontsource/ibm-plex-mono/400.css";
 import "@fontsource/ibm-plex-mono/500.css";
-// Editorial display face (variable: optical size + weight) for headlines and the
-// wordmark; warm, screen-tuned text face for body prose. Self-hosted so the
-// brand looks identical everywhere, not just on Apple devices with Hoefler Text.
-import "@fontsource-variable/fraunces/standard.css";
-import "@fontsource-variable/fraunces/standard-italic.css";
-import "@fontsource/newsreader/400.css";
-import "@fontsource/newsreader/600-italic.css";
+// EB Garamond: a classical old-style serif in the same lineage as Hoefler Text
+// (the previous Apple-only stack), self-hosted so the brand looks the same
+// everywhere. Variable weight (400-800) + a true italic, upright and italic.
+import "@fontsource-variable/eb-garamond/wght.css";
+import "@fontsource-variable/eb-garamond/wght-italic.css";
 
 const title = "Knyta — messy customer data in, clean data out";
 const description =
@@ -74,8 +72,8 @@ const jsonLd = {
         --good: #3d6b3f;
         --line: rgba(34,16,22,0.20);
         --line-soft: rgba(34,16,22,0.10);
-        --display: "Fraunces Variable", "Hoefler Text", "Iowan Old Style", Palatino, Georgia, serif;
-        --serif: "Newsreader", "Hoefler Text", "Iowan Old Style", Palatino, Georgia, serif;
+        --display: "EB Garamond Variable", "Hoefler Text", "Iowan Old Style", Palatino, Georgia, serif;
+        --serif: "EB Garamond Variable", "Hoefler Text", "Iowan Old Style", Palatino, Georgia, serif;
         --mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
       }
       * { box-sizing: border-box; margin: 0; }
