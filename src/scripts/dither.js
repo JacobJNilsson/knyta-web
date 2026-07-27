@@ -297,6 +297,7 @@ export function startDither(canvas, opts = {}) {
 
   let fieldArr = null; // accumulation buffer for boid splats (with margin)
   let fieldTmp = null; // scratch for the separable blur
+  let blurPref = null; // reusable prefix-sum scratch for the O(1) box blur
   let holdSel = null;  // last committed palette index per cell (255 = unset)
   let holdTime = null; // ms timestamp of each cell's last colour switch
   let creamData = null; // full-canvas fill of the low palette colour (out-of-band rows)
@@ -507,6 +508,7 @@ export function startDither(canvas, opts = {}) {
       fw = bw + 2 * PAD; fh = bh + 2 * PAD;
       fieldArr = new Float32Array(fw * fh);
       fieldTmp = new Float32Array(fw * fh);
+      blurPref = new Float64Array(Math.max(fw, fh) + 1);
     }
     holdSel = new Uint8Array(bw * bh).fill(255);
     holdTime = new Float64Array(bw * bh);
@@ -526,33 +528,39 @@ export function startDither(canvas, opts = {}) {
   // Separable box blur over the accumulation buffer, so the discrete boid
   // splats merge into one smooth blob *before* it gets dithered. This keeps the
   // chunky dither texture (unlike a CSS blur, which would smooth it away).
+  //
+  // Implemented with prefix sums (a row/column integral), so each output pixel
+  // costs O(1) regardless of the blur radius r — one linear pass to build the
+  // prefix, one to read windows. This replaces the old O(r)-per-pixel kernel,
+  // which dominated frame time at large radii and capped the frame rate.
+  //
   // Blur only the row range [ry0, ry1) of the padded buffer (defaults to all).
   // The horizontal pass covers ry0-r..ry1+r so the vertical pass has valid data.
+  // Windows are normalised by their actual (edge-clamped) width — no darkening
+  // at the buffer edges, and no division by zero (width >= 1 always).
   function blurBuffer(r, ry0, ry1) {
-    const norm = 1 / (2 * r + 1);
     const a0 = ry0 == null ? 0 : ry0, a1 = ry1 == null ? fh : ry1;
     const hy0 = Math.max(0, a0 - r), hy1 = Math.min(fh, a1 + r);
-    // Horizontal pass: fieldArr -> fieldTmp
+    const pref = blurPref;
+    // Horizontal pass: fieldArr -> fieldTmp, rows [hy0, hy1)
     for (let y = hy0; y < hy1; y++) {
       const o = y * fw;
+      let s = 0; pref[0] = 0;
+      for (let x = 0; x < fw; x++) { s += fieldArr[o + x]; pref[x + 1] = s; }
       for (let x = 0; x < fw; x++) {
-        let s = 0;
-        for (let k = -r; k <= r; k++) {
-          let xx = x + k; if (xx < 0) xx = 0; else if (xx >= fw) xx = fw - 1;
-          s += fieldArr[o + xx];
-        }
-        fieldTmp[o + x] = s * norm;
+        const lo = x - r < 0 ? 0 : x - r;
+        const hi = x + r >= fw ? fw - 1 : x + r;
+        fieldTmp[o + x] = (pref[hi + 1] - pref[lo]) / (hi - lo + 1);
       }
     }
-    // Vertical pass: fieldTmp -> fieldArr
+    // Vertical pass: fieldTmp -> fieldArr, rows [a0, a1). pref is indexed by row.
     for (let x = 0; x < fw; x++) {
+      let s = 0; pref[hy0] = 0;
+      for (let y = hy0; y < hy1; y++) { s += fieldTmp[y * fw + x]; pref[y + 1] = s; }
       for (let y = a0; y < a1; y++) {
-        let s = 0;
-        for (let k = -r; k <= r; k++) {
-          let yy = y + k; if (yy < 0) yy = 0; else if (yy >= fh) yy = fh - 1;
-          s += fieldTmp[yy * fw + x];
-        }
-        fieldArr[y * fw + x] = s * norm;
+        const lo = y - r < hy0 ? hy0 : y - r;
+        const hi = y + r >= hy1 ? hy1 - 1 : y + r;
+        fieldArr[y * fw + x] = (pref[hi + 1] - pref[lo]) / (hi - lo + 1);
       }
     }
   }
