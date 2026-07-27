@@ -82,18 +82,6 @@ const jsonLd = {
       a { color: inherit; }
       ::selection { background: var(--red); color: var(--cream); }
 
-      /* Legibility outline. A crisp 1px cream border around the glyphs keeps text
-         readable where the swarm's warm core drifts behind it — a hard edge (no
-         blur, no fade), built from eight 0-blur shadows for a gap-free ring.
-         Invisible over the cream page. Elements with their own solid fill (cards,
-         buttons) are excluded. */
-      h1, h2, h3, .eyebrow, .lede, .cta-ghost, .sec-no, .sec-intro, .who p, .who ul,
-      .steps > li > p, .demo-note, .contact p, .contact .email, header, footer {
-        text-shadow:
-          1px 0 0 var(--cream), -1px 0 0 var(--cream), 0 1px 0 var(--cream), 0 -1px 0 var(--cream),
-          1px 1px 0 var(--cream), -1px 1px 0 var(--cream), 1px -1px 0 var(--cream), -1px -1px 0 var(--cream);
-      }
-
       /* Page-wide dithered swarm. Absolute (not fixed) so it's pinned to the
          document and scrolls with the page; its height is set to the full page
          height in JS. The field's low end is the page cream, so it reads as a
@@ -105,6 +93,11 @@ const jsonLd = {
 
       .frame { position: relative; z-index: 1; min-height: 100vh; padding: clamp(0.9rem, 2.4vw, 1.9rem); }
       .mat {
+        /* Matted "paper" over the swarm: a translucent cream fill lifts the text
+           off the busy warm core for legibility, while the swarm stays fully
+           vivid in the frame margin around the mat and shows softly through here.
+           No effect on the letterforms themselves. */
+        background: rgba(242, 237, 227, 0.5);
         border: 1.5px solid var(--red);
         min-height: calc(100vh - clamp(1.8rem, 4.8vw, 3.8rem));
         padding: 0 clamp(1.4rem, 4.5vw, 3.5rem);
