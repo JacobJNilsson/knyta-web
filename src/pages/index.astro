@@ -9,7 +9,7 @@ import "@fontsource-variable/eb-garamond/wght-italic.css";
 
 const title = "Knyta — messy customer data in, clean data out";
 const description =
-  "Knyta is an AI-assisted data-ingestion engine. It turns the CSVs, exports, and one-off files other people send you into clean rows in your database — through pipelines you can read, replay, and trust. Postgres today; more destinations on the way.";
+  "Knyta is an AI-assisted data-ingestion engine. It turns the CSVs, exports, and one-off files other people send you into clean rows in your database — through pipelines you can read, replay, and trust. When a sender changes their format, the pipeline updates itself. Postgres today; more destinations on the way.";
 const site = "https://knyta.net";
 
 const jsonLd = {
@@ -273,7 +273,7 @@ const jsonLd = {
         <section class="hero">
           <p class="eyebrow"><b>knyta</b> /ˈknŷːta/ <i>verb, Swedish</i> — to tie; to knot; to bind together.</p>
           <h1>Customer data arrives messy. Yours lands <em>clean</em>.</h1>
-          <p class="lede">Knyta is an <strong>AI-assisted data-ingestion engine</strong>. It turns the CSVs, exports and one-off files other people send you into clean rows in your database — through pipelines you can <strong>read, replay and trust</strong>.</p>
+          <p class="lede">Knyta is an <strong>AI-assisted data-ingestion engine</strong>. It turns the CSVs, exports and one-off files other people send you into clean rows in your database — through pipelines you can <strong>read, replay and trust</strong>. And when a sender changes their format, <strong>the pipeline updates itself</strong>. You approve; nobody rewrites scripts at midnight.</p>
           <div class="cta">
             <a class="cta-primary" href="mailto:hello@knyta.net">hello@knyta.net</a>
             <a class="cta-ghost" href="#problem">see the problem ↓</a>
@@ -339,7 +339,7 @@ ORDER NO,customer,Amount ,date
         <section id="how">
           <p class="sec-no">03 — How it works</p>
           <h2>AI writes the pipeline once. <em>Boring</em>, deterministic code runs it forever.</h2>
-          <p class="sec-intro">Most "AI-powered" tools put a model in the hot path and hope. Knyta doesn't. AI does the one thing it's genuinely good at — reading a messy file nobody has seen before and writing the code to handle it. Everything after that is <strong>pinned, replayable and audited</strong>.</p>
+          <p class="sec-intro">Most "AI-powered" tools put a model in the hot path and hope. Knyta doesn't. AI does the one thing it's genuinely good at — reading a messy file nobody has seen before and writing the code to handle it. It does the same when a sender's format drifts, so <strong>the pipelines maintain themselves</strong>. Everything else is <strong>pinned, replayable and audited</strong>.</p>
 
           <ol class="steps">
             <li>
@@ -351,7 +351,7 @@ ORDER NO,customer,Amount ,date
               <p>Each file's structure is fingerprinted. A match runs the exact pipeline approved for that shape, deterministically: <b>same file in, same rows out</b>. A guard also compares value shapes, so a file whose columns quietly swapped meaning under unchanged headers parks for a human instead of delivering mis-mapped data.</p>
             </li>
             <li>
-              <h3>New shape? An agent writes the pipeline <span class="tag">sandboxed</span></h3>
+              <h3>New or changed shape? An agent writes the pipeline <span class="tag">sandboxed</span></h3>
               <p>An AI agent reads the actual file, writes readable pipeline code with an explicit validation contract, and tests it against that file through the real execution path — inside a sandbox with <b>no credentials and no network</b>.</p>
             </li>
             <li>
