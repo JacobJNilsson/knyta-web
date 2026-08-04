@@ -428,14 +428,14 @@ ORDER NO,customer,Amount ,date
         field: "boids",
         matrix: 8,
         speed: 1,
-        stepsPerSec: 30,
+        stepsPerSec: 16,
         boidCount: 128,
         scale: 4,
         cfg: {
-          maxSpeed: 0.0055, maxForce: 0.00036, perception: 0.27, separationDist: 0.075,
+          maxSpeed: 0.0085, maxForce: 0.00036, perception: 0.27, separationDist: 0.075,
           cohesion: 0.8, alignment: 1.05, separation: 2.25, flee: 9.4, fleeRadius: 0.56,
-          centering: 0.0004, homeSpeed: 0.155, edgeRepel: 0.0028, edgeMargin: 0.065,
-          damping: 0.96, splatSize: 0.025, splatIntensity: 2.3, blur: 0.1, blurPasses: 3, holdMs: 140,
+          centering: 0.0003, homeSpeed: 0.155, edgeRepel: 0.0028, edgeMargin: 0.065,
+          damping: 0.96, splatSize: 0.025, splatIntensity: 1.9, blur: 0.1, blurPasses: 2, holdMs: 140,
         },
       });
       // Keep the canvas matched to the page height, and re-measure once fonts
