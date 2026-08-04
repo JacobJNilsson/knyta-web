@@ -218,13 +218,15 @@ export function startDither(canvas, opts = {}) {
     maxSpeed: 0.0034, maxForce: 0.00026,
     perception: 0.4, separationDist: 0.055,
     cohesion: 1.6, alignment: 0.7, separation: 1.1,
-    flee: 3.0, fleeRadius: 0.26, centering: 0.0003,
-    homeSpeed: 0.06,   // how fast the wandering "home" roams the page
-    // Off-screen recovery. A boid more than one perception radius outside the
-    // viewport steers for the nearest view edge instead of home. Its pull is
-    // centering * (1 + offscreenPull * that excess distance), and it may fly up
-    // to offscreenSpeed times maxSpeed. Both fall back to normal once the edge
-    // is within perception.
+    flee: 3.0, fleeRadius: 0.26,
+    // Off-screen recovery. Nothing pulls the flock to a point, so the view is
+    // its only fence. A boid outside the view steers back until it is one
+    // perception radius inside the near edge. The force is viewReturn times the
+    // distance to that line, multiplied by (1 + offscreenPull * the distance
+    // outside the view). The same multiplier lifts the speed limit, up to
+    // offscreenSpeed times maxSpeed, so a boid that a scroll left far behind
+    // returns quickly. Both fall back to normal as the boid comes back in.
+    viewReturn: 0.0003,
     offscreenPull: 10,
     offscreenSpeed: 4,
     edgeRepel: 0.0012, // strength of the off-screen repellent around the edges
@@ -255,7 +257,7 @@ export function startDither(canvas, opts = {}) {
   // px/py: precise eased pointer (used by the clear disc). bx/by: the blob's
   // own centre — a slow, wandering drift *toward* the pointer, so it feels alive
   // rather than glued under the cursor.
-  const P = { px: 0.5, py: 0.5, tx: 0.5, ty: 0.5, bx: 0.5, by: 0.5, hx: 0.8, hy: 0.5, pd: 0, down: 0, active: 0, ripples: [] };
+  const P = { px: 0.5, py: 0.5, tx: 0.5, ty: 0.5, bx: 0.5, by: 0.5, pd: 0, down: 0, active: 0, ripples: [] };
   // Active touch points (pointerId -> {tx, ty}). On mobile each finger is a
   // repellent the swarm flees, so it dodges touches.
   const touches = new Map();
@@ -321,7 +323,6 @@ export function startDither(canvas, opts = {}) {
 
   // Scroll coupling.
   let scrollY = 0;
-  let homeScrollU = null; // viewport top (in heights) at the previous boid step
   if (scroll) {
     const onScroll = () => {
       const y = window.scrollY || window.pageYOffset || 0;
@@ -349,44 +350,19 @@ export function startDither(canvas, opts = {}) {
     const SEP2 = cfg.separationDist * cfg.separationDist;
     const FLEE_R = cfg.fleeRadius;
     // Page space, normalised by viewport height: viewport is [0,aspectInv] x 1,
-    // document runs to y = S. Home tracks the current viewport (scroll offset).
+    // document runs to y = S.
     const aspectInv = bw / vhCells;                      // viewport width in heights
     const S = bh / vhCells;                              // document height in heights
     const scrollU = scrollY / (window.innerHeight || 1); // viewport top, in heights
     const curX = P.px * aspectInv;                       // cursor x (P.px is width-norm)
     const curY = P.py * S;                               // cursor y (P.py is doc-norm)
     const press = P.pd; // smoothed press amount 0..1
-    // Home wanders within the current viewport, but slides to the cursor while
-    // pressed so the swarm gathers there through the gentle centering force.
-    // Carry home with the page. Home lives in document space, so a scroll
-    // leaves it behind: the easing below moves 2.5% per step and can never
-    // catch a scroll gesture. Only home moves — the swarm keeps its absolute
-    // position in the document and must fly to the new home on its own.
-    if (homeScrollU === null) homeScrollU = scrollU;
-    P.hy += scrollU - homeScrollU;
-    homeScrollU = scrollU;
-    // Wandering target within the current viewport.
-    const wanderX = aspectInv * (0.5 + 0.45 * Math.sin(t * cfg.homeSpeed));
-    const wanderY = scrollU + (0.5 + 0.45 * Math.sin(t * cfg.homeSpeed * 0.73 + 2.1));
-    if (P.down) {
-      // Teleport to and stay exactly under the pointer while held.
-      P.hx = P.tx * aspectInv; P.hy = P.ty * S;
-    } else {
-      // On release, resume wandering FROM the current position: ease the
-      // persistent home toward the (moving) wander target.
-      P.hx += (wanderX - P.hx) * 0.025;
-      P.hy += (wanderY - P.hy) * 0.025;
-    }
-    // Hard clamp home into the visible band. The carry above handles smooth
-    // scrolling; this catches everything else that can strand it (a resize, an
-    // anchor jump, a document that grew, a press near the viewport edge).
-    const HM = Math.min(0.03, S * 0.5);
-    P.hy = Math.min(Math.max(P.hy, scrollU + HM), scrollU + Math.min(1, S) - HM);
-    P.hx = Math.min(Math.max(P.hx, HM), Math.max(HM, aspectInv - HM));
-    const homeX = P.hx, homeY = P.hy;
     const em = cfg.edgeMargin, er = cfg.edgeRepel;
-    // The visible band, used to tell which boids have drifted out of view.
+    // The visible band, and the line one perception radius inside each of its
+    // edges. A boid that leaves the view steers for the near line.
     const vTop = scrollU, vBot = scrollU + Math.min(1, S);
+    const inTop = vTop + Math.min(cfg.perception, Math.min(1, S) * 0.5);
+    const inBot = vBot - Math.min(cfg.perception, Math.min(1, S) * 0.5);
     for (let i = 0; i < boids.length; i++) {
       const b = boids[i];
       let alx = 0, aly = 0, cox = 0, coy = 0, sepx = 0, sepy = 0, nc = 0;
@@ -443,23 +419,19 @@ export function startDither(canvas, opts = {}) {
           }
         }
       }
-      // A boid too far outside the view to see the edge makes straight for the
-      // nearest edge — the shortest way back into sight. Steering for home
-      // instead would send it on a long diagonal while it stays invisible.
-      // The drive stops as soon as the edge is inside the perception radius:
-      // from there the boid can see its way in, so normal flocking and the home
-      // pull take over. The pull and the speed limit grow with `reach`, which
-      // is zero at the handoff, so neither jumps as the boid crosses it.
+      // A boid outside the view makes straight back in — the shortest way to
+      // sight again. It aims one perception radius past the near edge, so it
+      // arrives inside the view and not on its boundary. Nothing acts on a boid
+      // that is already in view: inside the band the flock swims free.
+      // The force and the speed limit grow with `off`, the distance outside the
+      // view. Both are zero at the edge, so neither jumps as a boid crosses it.
       const off = b.y < vTop ? vTop - b.y : b.y > vBot ? b.y - vBot : 0;
-      const reach = off - cfg.perception;
       let boost = 1;
-      if (reach > 0) {
-        boost = 1 + Math.min(reach, 3) * cfg.offscreenPull;
-        const edgeY = b.y < vTop ? vTop : vBot;
-        ay += (edgeY - b.y) * cfg.centering * boost;
-      } else {
-        ax += (homeX - b.x) * cfg.centering;
-        ay += (homeY - b.y) * cfg.centering;
+      if (off > 0) {
+        boost = 1 + Math.min(off, 3) * cfg.offscreenPull;
+        const aimY = b.y < vTop ? inTop : inBot;
+        const ramp = Math.min(off / cfg.perception, 1);
+        ay += (aimY - b.y) * cfg.viewReturn * boost * ramp;
       }
       // Edge repellent all around the screen — push inward, stronger the deeper
       // a boid strays into the margin, so the swarm avoids leaving the page.
