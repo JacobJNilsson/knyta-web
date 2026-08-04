@@ -29,7 +29,11 @@ Domain: `knyta.net` (+ `www` redirect) is attached to the Vercel project. DNS li
 
 ## TODO
 
-- [ ] Set up email for `hello@knyta.net` (registrar forwarding or Cloudflare Email Routing) — the site's only CTA points there.
+- [ ] **Set up email for `hello@knyta.net`.** `dig MX knyta.net` returns nothing
+      on 2026-08-04, so the domain accepts no mail. Every call to action on the
+      site points at that address, so every visitor who answers gets a bounce.
+      Use registrar forwarding or Cloudflare Email Routing, then send a test
+      message from an outside account before the next deploy.
 - [ ] Redraw `public/og.png`. The card still shows the old headline
       ("Customer data arrives messy. Yours lands clean."), so a shared link
       contradicts the page. Set it to "Their export is a mess. Your table
