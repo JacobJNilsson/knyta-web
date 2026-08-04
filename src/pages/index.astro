@@ -171,7 +171,10 @@ const jsonLd = {
       .who ul { list-style: none; padding: 0; font-family: var(--mono); font-size: 0.82rem; line-height: 2.1; }
       .who .y::before { content: "→ "; color: var(--red); }
       .who .n { color: var(--muted); text-decoration: line-through; text-decoration-color: var(--red); }
-      .who .y + .n { margin-top: 1rem; }
+      /* The two halves of this list answer different questions, so each gets a
+         label. Strikethrough alone left the reader to infer the split. */
+      .who .lbl { font-size: 0.66rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--red); line-height: 1.6; margin-bottom: 0.5rem; }
+      .who .y + .lbl { margin-top: 1.8rem; }
 
       /* How it works — timeline */
       .steps { list-style: none; padding: 0; position: relative; max-width: 46rem; margin-top: 2.4rem; }
@@ -328,10 +331,12 @@ ORDER NO,customer,Amount ,date
               <p>Destinations are <strong>pluggable by design</strong>. Each one declares what it can do, and the engine delivers to it with the same transactional care. Postgres works today; APIs and other databases are on the way.</p>
             </div>
             <ul>
+              <li class="lbl">Sound familiar?</li>
               <li class="y">the file arrives as an attachment</li>
               <li class="y">the format changes without warning</li>
               <li class="y">only you know what the columns mean</li>
               <li class="y">"the export" is the integration</li>
+              <li class="lbl">What you won't get from us</li>
               <li class="n">book-a-demo walls</li>
               <li class="n">per-seat enterprise pricing</li>
               <li class="n">"just send it in our template"</li>
