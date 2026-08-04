@@ -310,12 +310,22 @@ export function startDither(canvas, opts = {}) {
   // tall; the document runs to y = S. Height-normalising keeps flocking spacing
   // and blob size consistent across aspect ratios, and lets agent count scale
   // with the viewport's area (a true density).
-  let vhCells = 1, cw = 1;
+  let vhCells = 1, cw = 1, chpx = 1;
 
   // Scroll coupling.
   let scrollY = 0;
+  let homeScrollU = null; // viewport top (in heights) at the previous boid step
   if (scroll) {
-    const onScroll = () => { scrollY = window.scrollY || window.pageYOffset || 0; };
+    const onScroll = () => {
+      const y = window.scrollY || window.pageYOffset || 0;
+      // P.ty and the touch points are document-relative, but a cursor or finger
+      // is fixed to the viewport. Carry the stored targets with the page so they
+      // keep pointing at the real input while the user scrolls without moving.
+      const dy = (y - scrollY) / chpx;
+      if (P.active) P.ty += dy;
+      for (const tp of touches.values()) tp.ty += dy;
+      scrollY = y;
+    };
     window.addEventListener('scroll', onScroll, { passive: true });
     onScroll();
     cleanups.push(() => window.removeEventListener('scroll', onScroll));
@@ -341,6 +351,13 @@ export function startDither(canvas, opts = {}) {
     const press = P.pd; // smoothed press amount 0..1
     // Home wanders within the current viewport, but slides to the cursor while
     // pressed so the swarm gathers there through the gentle centering force.
+    // Carry home with the page. Home lives in document space, so a scroll
+    // leaves it behind: the easing below moves 2.5% per step and can never
+    // catch a scroll gesture. Only home moves — the swarm keeps its absolute
+    // position in the document and must fly to the new home on its own.
+    if (homeScrollU === null) homeScrollU = scrollU;
+    P.hy += scrollU - homeScrollU;
+    homeScrollU = scrollU;
     // Wandering target within the current viewport.
     const wanderX = aspectInv * (0.5 + 0.45 * Math.sin(t * cfg.homeSpeed));
     const wanderY = scrollU + (0.5 + 0.45 * Math.sin(t * cfg.homeSpeed * 0.73 + 2.1));
@@ -353,6 +370,12 @@ export function startDither(canvas, opts = {}) {
       P.hx += (wanderX - P.hx) * 0.025;
       P.hy += (wanderY - P.hy) * 0.025;
     }
+    // Hard clamp home into the visible band. The carry above handles smooth
+    // scrolling; this catches everything else that can strand it (a resize, an
+    // anchor jump, a document that grew, a press near the viewport edge).
+    const HM = Math.min(0.03, S * 0.5);
+    P.hy = Math.min(Math.max(P.hy, scrollU + HM), scrollU + Math.min(1, S) - HM);
+    P.hx = Math.min(Math.max(P.hx, HM), Math.max(HM, aspectInv - HM));
     const homeX = P.hx, homeY = P.hy;
     const em = cfg.edgeMargin, er = cfg.edgeRepel;
     for (let i = 0; i < boids.length; i++) {
@@ -497,6 +520,7 @@ export function startDither(canvas, opts = {}) {
   function resize() {
     const r = canvas.getBoundingClientRect();
     cw = r.width || 1;
+    chpx = r.height || 1;
     bw = Math.max(1, Math.ceil(r.width / scale));
     bh = Math.max(1, Math.ceil(r.height / scale));
     canvas.width = bw;
