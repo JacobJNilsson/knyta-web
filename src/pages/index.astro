@@ -351,19 +351,19 @@ ORDER NO,customer,Amount ,date
             </li>
             <li>
               <h3>Known shape? It runs the pinned pipeline <span class="tag">no AI here</span></h3>
-              <p>Each file's structure is fingerprinted. A match runs the exact pipeline approved for that shape, deterministically: <b>same file in, same rows out</b>. A guard also compares value shapes, so a file whose columns quietly swapped meaning under unchanged headers parks for a human instead of delivering mis-mapped data.</p>
+              <p>Knyta recognises a file it has handled before and runs the pipeline you already approved for it: <b>same file in, same rows out</b>. It also checks that the values still look the way they should. If two columns quietly swapped meaning behind unchanged headers, the file parks for a human instead of landing wrong.</p>
             </li>
             <li>
               <h3>New or changed shape? An agent writes the pipeline <span class="tag">sandboxed</span></h3>
-              <p>An AI agent reads the actual file, writes readable pipeline code with an explicit validation contract, and tests it against that file through the real execution path — inside a sandbox with <b>no credentials and no network</b>.</p>
+              <p>An AI agent reads the actual file and writes readable pipeline code for it. The agent then tests that code against the file, through the same path a real run takes. All of this happens in a sandbox with <b>no credentials and no network</b>.</p>
             </li>
             <li>
               <h3>Nothing new touches production without approval <span class="tag">probation</span></h3>
-              <p>A freshly written pipeline starts in probation: a human reviews its first output before anything reaches a live destination. Until then it runs against a dry-run client that is <b>structurally incapable of writing</b>.</p>
+              <p>A new pipeline starts on probation. A person reads its first output before one row reaches your database. Until you approve it, the pipeline writes to a stand-in that <b>cannot write anything, by construction</b>.</p>
             </li>
             <li class="last">
-              <h3>Delivery lands transactionally</h3>
-              <p>Delivery runs as a saga: retried when it's provably safe, rolled back in reverse order when a step fails, and <b>quarantined with full context</b> when the outcome can't be known. A file that fails validation quarantines whole, never a half-imported mystery.</p>
+              <h3>Delivery is all or nothing</h3>
+              <p><b>You never get half a file.</b> One that fails validation is held whole. If a step of a delivery fails, Knyta undoes the steps before it. If the outcome cannot be known, the file waits for you with its full history. <i>(Deliveries run as a saga: retried when that is provably safe, rolled back in reverse order, quarantined when the result is unknowable.)</i></p>
             </li>
           </ol>
         </section>
