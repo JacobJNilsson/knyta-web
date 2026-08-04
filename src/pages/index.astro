@@ -288,12 +288,12 @@ const jsonLd = {
         <section class="hero">
           <p class="eyebrow"><b>knyta</b> /ˈknŷːta/ <i>verb, Swedish</i> — to tie; to knot; to bind together.</p>
           <h1>Their export is a mess. Your table <em>isn't</em>.</h1>
-          <p class="lede">Knyta turns the CSVs and exports other people send you into clean rows in your database. Every file runs through <strong>pipeline code you can read, replay and trust</strong>. When a sender changes their format, Knyta rewrites the pipeline. Nobody fixes a script at midnight.</p>
+          <p class="lede">Knyta turns the CSVs and exports other people send you into clean rows in your database. Every file runs through <strong>pipeline code you can read, replay and trust</strong>. When a sender changes their format, Knyta rewrites the pipeline. Nothing lands in your database until you accept the result. Nobody fixes a script at midnight.</p>
           <div class="cta">
             <a class="cta-primary" href="mailto:hello@knyta.net?subject=Our%20worst%20file">Send us your worst file →</a>
             <a class="cta-ghost" href="#problem">see it run on a real file ↓</a>
           </div>
-          <p class="cta-note">We set it up with you. You don't build or maintain anything.</p>
+          <p class="cta-note">We set it up with you. You build nothing, maintain nothing, and keep the final yes.</p>
         </section>
 
         <section id="problem">
@@ -373,8 +373,8 @@ ORDER NO,customer,Amount ,date
               <p>An AI agent reads the actual file and writes readable pipeline code for it. The agent then tests that code against the file, through the same path a real run takes. All of this happens in a sandbox with <b>no credentials and no network</b>.</p>
             </li>
             <li>
-              <h3>Nothing new touches production without approval <span class="tag">probation</span></h3>
-              <p>A new pipeline starts on probation. A person reads its first output and signs it off before one row reaches your database. Until that happens, the pipeline writes to a stand-in that <b>cannot write anything, by construction</b>.</p>
+              <h3>Nothing reaches your database until you say yes <span class="tag">probation</span></h3>
+              <p>A new pipeline starts on probation. It writes to a stand-in that <b>cannot write anything, by construction</b>. You see the rows it would have delivered, and none of them become real until you accept them.</p>
             </li>
             <li class="last">
               <h3>Delivery is all or nothing</h3>
