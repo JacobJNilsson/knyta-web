@@ -143,6 +143,8 @@ const jsonLd = {
       .cta-primary:hover { background: var(--plum); }
       .cta-ghost { font-family: var(--mono); font-size: 0.78rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); text-decoration: none; }
       .cta-ghost:hover { color: var(--red); }
+      /* Answers "what do I have to do?" at the point where the reader decides. */
+      .cta-note { font-family: var(--mono); font-size: 0.74rem; line-height: 1.7; color: var(--muted); margin-top: 1.1rem; }
 
       /* Before / after demo */
       .demo { display: grid; grid-template-columns: minmax(0,1fr) auto minmax(0,1fr); gap: 1.1rem; align-items: stretch; margin-top: 2.6rem; }
@@ -291,6 +293,7 @@ const jsonLd = {
             <a class="cta-primary" href="mailto:hello@knyta.net?subject=Our%20worst%20file">Send us your worst file →</a>
             <a class="cta-ghost" href="#problem">see it run on a real file ↓</a>
           </div>
+          <p class="cta-note">We set it up with you. You don't build or maintain anything.</p>
         </section>
 
         <section id="problem">
@@ -412,7 +415,7 @@ ORDER NO,customer,Amount ,date
         <section id="contact" class="contact">
           <p class="sec-no">05 — Contact</p>
           <h2>Tell us about your <em>worst</em> file.</h2>
-          <p>We work hands-on with a handful of early users right now. Send the ugliest file you deal with, and we'll tell you straight whether we can tie it down. You get an answer within two working days.</p>
+          <p>We work hands-on with a handful of early users right now. Send the ugliest file you deal with, and we'll tell you straight whether we can tie it down. You get an answer within two working days, and if it's a fit, we do the setup with you.</p>
           <p class="fineprint">Your file stays between us. We use it to answer your question and nothing else, we never pass it on, and we delete it whenever you ask. If an NDA makes this easier, say so and we'll sign one first.</p>
           <a class="email" href="mailto:hello@knyta.net?subject=Our%20worst%20file">hello@knyta.net</a>
         </section>
