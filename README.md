@@ -30,4 +30,7 @@ Domain: `knyta.net` (+ `www` redirect) is attached to the Vercel project. DNS li
 ## TODO
 
 - [ ] Set up email for `hello@knyta.net` (registrar forwarding or Cloudflare Email Routing) — the site's only CTA points there.
-- [ ] OG image (currently text-only OG tags).
+- [ ] Redraw `public/og.png`. The card still shows the old headline
+      ("Customer data arrives messy. Yours lands clean."), so a shared link
+      contradicts the page. Set it to "Their export is a mess. Your table
+      isn't." in the same layout.
