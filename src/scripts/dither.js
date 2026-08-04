@@ -220,6 +220,13 @@ export function startDither(canvas, opts = {}) {
     cohesion: 1.6, alignment: 0.7, separation: 1.1,
     flee: 3.0, fleeRadius: 0.26, centering: 0.0003,
     homeSpeed: 0.06,   // how fast the wandering "home" roams the page
+    // Off-screen recovery. A boid more than one perception radius outside the
+    // viewport steers for the nearest view edge instead of home. Its pull is
+    // centering * (1 + offscreenPull * that excess distance), and it may fly up
+    // to offscreenSpeed times maxSpeed. Both fall back to normal once the edge
+    // is within perception.
+    offscreenPull: 10,
+    offscreenSpeed: 4,
     edgeRepel: 0.0012, // strength of the off-screen repellent around the edges
     edgeMargin: 0.06,  // how close to an edge before the repellent kicks in
     damping: 0.9, // velocity retention per frame; <1 settles the swarm
@@ -378,6 +385,8 @@ export function startDither(canvas, opts = {}) {
     P.hx = Math.min(Math.max(P.hx, HM), Math.max(HM, aspectInv - HM));
     const homeX = P.hx, homeY = P.hy;
     const em = cfg.edgeMargin, er = cfg.edgeRepel;
+    // The visible band, used to tell which boids have drifted out of view.
+    const vTop = scrollU, vBot = scrollU + Math.min(1, S);
     for (let i = 0; i < boids.length; i++) {
       const b = boids[i];
       let alx = 0, aly = 0, cox = 0, coy = 0, sepx = 0, sepy = 0, nc = 0;
@@ -434,16 +443,35 @@ export function startDither(canvas, opts = {}) {
           }
         }
       }
-      ax += (homeX - b.x) * cfg.centering; ay += (homeY - b.y) * cfg.centering;
+      // A boid too far outside the view to see the edge makes straight for the
+      // nearest edge — the shortest way back into sight. Steering for home
+      // instead would send it on a long diagonal while it stays invisible.
+      // The drive stops as soon as the edge is inside the perception radius:
+      // from there the boid can see its way in, so normal flocking and the home
+      // pull take over. The pull and the speed limit grow with `reach`, which
+      // is zero at the handoff, so neither jumps as the boid crosses it.
+      const off = b.y < vTop ? vTop - b.y : b.y > vBot ? b.y - vBot : 0;
+      const reach = off - cfg.perception;
+      let boost = 1;
+      if (reach > 0) {
+        boost = 1 + Math.min(reach, 3) * cfg.offscreenPull;
+        const edgeY = b.y < vTop ? vTop : vBot;
+        ay += (edgeY - b.y) * cfg.centering * boost;
+      } else {
+        ax += (homeX - b.x) * cfg.centering;
+        ay += (homeY - b.y) * cfg.centering;
+      }
       // Edge repellent all around the screen — push inward, stronger the deeper
-      // a boid strays into the margin, so the swarm avoids leaving the viewport.
+      // a boid strays into the margin, so the swarm avoids leaving the page.
       if (b.x < em) ax += (1 - b.x / em) * er;
       else if (b.x > aspectInv - em) ax -= (1 - (aspectInv - b.x) / em) * er;
       if (b.y < em) ay += (1 - b.y / em) * er;
       else if (b.y > S - em) ay -= (1 - (S - b.y) / em) * er;
       // Damping bleeds off momentum so the swarm settles instead of oscillating.
       b.vx = (b.vx + ax) * cfg.damping; b.vy = (b.vy + ay) * cfg.damping;
-      const f = lf(b.vx, b.vy, MS); b.vx *= f; b.vy *= f;
+      // Off-screen boids may exceed the normal speed limit, up to offscreenSpeed
+      // times it. Without this the cap, not the pull, sets the return time.
+      const f = lf(b.vx, b.vy, MS * Math.min(boost, cfg.offscreenSpeed)); b.vx *= f; b.vy *= f;
       b.x += b.vx; b.y += b.vy;
     }
   }
