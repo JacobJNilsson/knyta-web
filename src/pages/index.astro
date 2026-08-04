@@ -215,7 +215,12 @@ const jsonLd = {
         .arrow { justify-content: center; }
         .arrow svg { transform: rotate(90deg); }
         .who, .grid { grid-template-columns: 1fr; }
-        header .rooms { display: none; }
+        /* Keep the nav on a phone: it holds the only link to the contact
+           section above the fold. "Built in Sweden" gives up its place
+           instead, because the footer says it again. */
+        header { flex-wrap: wrap; gap: 0.5rem 1rem; }
+        header .rooms { gap: 0.8rem; font-size: 0.66rem; letter-spacing: 0.08em; }
+        header .built { display: none; }
       }
     </style>
 
@@ -275,7 +280,7 @@ const jsonLd = {
             <a href="#principles">Principles</a>
             <a href="mailto:hello@knyta.net">Contact</a>
           </span>
-          <span>Built in Sweden</span>
+          <span class="built">Built in Sweden</span>
         </header>
 
         <section class="hero">
