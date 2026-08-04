@@ -196,6 +196,9 @@ const jsonLd = {
       .contact { text-align: center; margin-top: auto; }
       .contact h2 { margin: 0 auto 1.2rem; }
       .contact p { font-family: var(--mono); font-size: 0.84rem; line-height: 1.85; color: var(--muted); max-width: 40rem; margin: 0 auto 2rem; }
+      /* The confidentiality note answers the one objection that stops a reader
+         from sending a real customer file. It sits quieter than the ask. */
+      .contact .fineprint { font-size: 0.74rem; max-width: 36rem; opacity: 0.85; }
       .contact .email { font-family: var(--mono); font-size: clamp(1.1rem, 3vw, 1.6rem); color: var(--red); text-decoration: none; }
       .contact .email:hover { color: var(--plum); }
 
@@ -397,7 +400,8 @@ ORDER NO,customer,Amount ,date
         <section id="contact" class="contact">
           <p class="sec-no">05 — Contact</p>
           <h2>Tell us about your <em>worst</em> file.</h2>
-          <p>We're working hands-on with a handful of early users right now. If someone else's data is eating your week, send the ugliest file you deal with and we'll tell you straight whether we can tie it down. We want to know where this problem lives.</p>
+          <p>We work hands-on with a handful of early users right now. Send the ugliest file you deal with, and we'll tell you straight whether we can tie it down. You get an answer within two working days.</p>
+          <p class="fineprint">Your file stays between us. We use it to answer your question and nothing else, we never pass it on, and we delete it whenever you ask. If an NDA makes this easier, say so and we'll sign one first.</p>
           <a class="email" href="mailto:hello@knyta.net?subject=Our%20worst%20file">hello@knyta.net</a>
         </section>
 
