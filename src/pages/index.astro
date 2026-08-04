@@ -8,8 +8,10 @@ import "@fontsource-variable/eb-garamond/wght.css";
 import "@fontsource-variable/eb-garamond/wght-italic.css";
 
 const title = "Knyta — their export is a mess, your table isn't";
+// Keep this under about 155 characters: search results and link previews cut
+// it there, so anything past that point is never read.
 const description =
-  "Knyta is an AI-assisted data-ingestion engine. It turns the CSVs, exports, and one-off files other people send you into clean rows in your database — through pipelines you can read, replay, and trust. When a sender changes their format, the pipeline updates itself. Postgres today; more destinations on the way.";
+  "Knyta turns the CSVs and exports other people send you into clean rows in your database. When a sender changes their format, the pipeline rewrites itself.";
 const site = "https://knyta.net";
 
 const jsonLd = {
