@@ -119,7 +119,7 @@ const jsonLd = {
 
       section { padding: clamp(3rem, 7vw, 6rem) 0; border-top: 1px solid var(--line); }
       section:first-of-type { border-top: none; }
-      .sec-no { font-family: var(--mono); font-size: 0.68rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--red); margin-bottom: 1rem; }
+      .sec-label { font-family: var(--mono); font-size: 0.68rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--red); margin-bottom: 1rem; }
       h2 { font-family: var(--display); font-weight: 500; font-size: clamp(1.9rem, 4.2vw, 3rem); line-height: 1.05; letter-spacing: -0.015em; max-width: 26ch; }
       h2 em { font-style: italic; color: var(--red); }
       .sec-intro { font-family: var(--mono); font-size: 0.84rem; line-height: 1.8; color: var(--muted); max-width: 44rem; margin-top: 1.4rem; }
@@ -297,7 +297,7 @@ const jsonLd = {
         </section>
 
         <section id="problem">
-          <p class="sec-no">01 — The problem</p>
+          <p class="sec-label">The problem</p>
           <h2>Nobody exports a file with <em>your</em> database in mind.</h2>
           <p class="sec-intro">Every file someone sends you was made in a hurry, on somebody's Tuesday evening. Your work runs on data other people produce. It arrives as <strong>whatever their system happened to export</strong>: headers on line four, decimal commas, three date formats in one column, a TOTAL row at the bottom. Generic ETL tools assume clean input. Reality doesn't, so someone cleans it by hand. Usually you.</p>
 
@@ -332,7 +332,7 @@ ORDER NO,customer,Amount ,date
         </section>
 
         <section id="who">
-          <p class="sec-no">02 — Who it's for</p>
+          <p class="sec-label">Who it's for</p>
           <div class="who">
             <div>
               <h2>If someone else's file decides how your week goes.</h2>
@@ -355,7 +355,7 @@ ORDER NO,customer,Amount ,date
         </section>
 
         <section id="how">
-          <p class="sec-no">03 — How it works</p>
+          <p class="sec-label">How it works</p>
           <h2>AI writes the pipeline once. <em>Boring</em>, deterministic code runs it forever.</h2>
           <p class="sec-intro">Most "AI-powered" tools put a model in the hot path and hope. Knyta doesn't. AI does the one thing it's genuinely good at — reading a messy file nobody has seen before and writing the code to handle it. It does the same when a sender's format drifts, so <strong>the pipelines maintain themselves</strong>. Everything else is <strong>pinned, replayable and audited</strong>.</p>
 
@@ -384,7 +384,7 @@ ORDER NO,customer,Amount ,date
         </section>
 
         <section id="principles">
-          <p class="sec-no">04 — Principles</p>
+          <p class="sec-label">Principles</p>
           <h2>Built the way you'd build it, if you had the month to spare.</h2>
           <p class="sec-intro">Data ingestion fails in quiet, expensive ways. Four rules hold up everything we build.</p>
 
@@ -413,7 +413,7 @@ ORDER NO,customer,Amount ,date
         </section>
 
         <section id="contact" class="contact">
-          <p class="sec-no">05 — Contact</p>
+          <p class="sec-label">Contact</p>
           <h2>Tell us about your <em>worst</em> file.</h2>
           <p>We work hands-on with a handful of early users right now. Send the ugliest file you deal with, and we'll tell you straight whether we can tie it down. You get an answer within two working days, and if it's a fit, we do the setup with you.</p>
           <p class="fineprint">Your file stays between us. We use it to answer your question and nothing else, we never pass it on, and we delete it whenever you ask. If an NDA makes this easier, say so and we'll sign one first.</p>
