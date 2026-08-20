@@ -12,7 +12,7 @@ function bayer(n) {
   if (n === 1) return [[0]];
   const half = bayer(n / 2);
   const h = n / 2;
-  const m = Array.from({ length: n }, () => new Array(n).fill(0));
+  const m = Array.from({ length: n }, () => Array.from({ length: n }, () => 0));
   for (let y = 0; y < h; y++) {
     for (let x = 0; x < h; x++) {
       const base = half[y][x] * 4;
@@ -44,14 +44,12 @@ const TAU = Math.PI * 2;
 // "untying".
 const KNOT_PTS = (() => {
   const N = 150;
-  const pts = new Array(N);
-  for (let i = 0; i < N; i++) {
+  return Array.from({ length: N }, (_, i) => {
     const th = (i / N) * TAU;
     const x = Math.sin(th) + 2 * Math.sin(2 * th);
     const y = Math.cos(th) - 2 * Math.cos(2 * th);
-    pts[i] = [x / 3.2, y / 3.2];
-  }
-  return pts;
+    return [x / 3.2, y / 3.2];
+  });
 })();
 
 const FIELDS = {
@@ -235,7 +233,7 @@ export function startDither(canvas, opts = {}) {
     splatSize: 0.045, splatIntensity: 2.6,
     blur: 0.06, blurPasses: 3,
     holdMs: 0, // a cell can't switch colour again until this many ms have passed
-    ...(opts.cfg || {}),
+    ...opts.cfg,
   };
 
   const ctx = canvas.getContext('2d', { alpha: false });
@@ -319,7 +317,7 @@ export function startDither(canvas, opts = {}) {
   // tall; the document runs to y = S. Height-normalising keeps flocking spacing
   // and blob size consistent across aspect ratios, and lets agent count scale
   // with the viewport's area (a true density).
-  let vhCells = 1, cw = 1, chpx = 1;
+  let vhCells = 1, chpx = 1;
 
   // Scroll coupling.
   let scrollY = 0;
@@ -344,7 +342,7 @@ export function startDither(canvas, opts = {}) {
   // scale factor that limits (fx,fy) to a max magnitude
   const lf = (fx, fy, max) => { const m = Math.hypot(fx, fy); return m > max && m > 1e-9 ? max / m : 1; };
 
-  function stepBoids(t) {
+  function stepBoids() {
     const MS = cfg.maxSpeed, MF = cfg.maxForce;
     const PERC2 = cfg.perception * cfg.perception;
     const SEP2 = cfg.separationDist * cfg.separationDist;
@@ -519,7 +517,6 @@ export function startDither(canvas, opts = {}) {
 
   function resize() {
     const r = canvas.getBoundingClientRect();
-    cw = r.width || 1;
     chpx = r.height || 1;
     bw = Math.max(1, Math.ceil(r.width / scale));
     bh = Math.max(1, Math.ceil(r.height / scale));
@@ -647,7 +644,7 @@ export function startDither(canvas, opts = {}) {
       // rate: 120 Hz renders twice as often but steps the boids just as fast.
       acc += dt;
       let steps = 0;
-      while (acc >= stepMs && steps < 5) { stepBoids(t); acc -= stepMs; steps++; }
+      while (acc >= stepMs && steps < 5) { stepBoids(); acc -= stepMs; steps++; }
       splatBoids();
       const br = Math.max(1, Math.round(vhCells * cfg.blur));
       for (let p = 0; p < cfg.blurPasses; p++) blurBuffer(br, vy0 + PAD, vy1 + PAD);
