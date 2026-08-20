@@ -509,7 +509,7 @@ ORDER NO,customer,Amount ,date
         // Restore a previously-tuned config so reloads (incl. code edits) don't wipe it.
         try {
           const saved = JSON.parse(localStorage.getItem(STORE) || "null");
-          if (saved) for (const [, key] of SPEC) if (key in saved && typeof saved[key] === "number") set(key, saved[key]);
+          if (saved) for (const [, key] of SPEC) if (Number.isFinite(saved[key])) set(key, saved[key]);
         } catch (e) {}
         const fmt = (v) => Math.abs(v) < 0.01 && v !== 0 ? v.toExponential(1) : (Math.round(v * 1000) / 1000);
         const box = document.getElementById("sliders");
@@ -530,7 +530,7 @@ ORDER NO,customer,Amount ,date
           const dump = { boidCount: ctrl.getCount(), scale: ctrl.getScale(), stepsPerSec: Math.round(ctrl.getStepRate()), cfg: ctrl.cfg };
           const txt = JSON.stringify(dump, null, 2);
           out.style.display = "block"; out.value = txt;
-          navigator.clipboard && navigator.clipboard.writeText(txt).catch(() => {});
+          if (navigator.clipboard) navigator.clipboard.writeText(txt).catch(() => {});
         });
         document.getElementById("resetCfg").addEventListener("click", () => {
           try { localStorage.removeItem(STORE); } catch (e) {}
